@@ -19,6 +19,7 @@ from scripts.supported_preprocessor import (
 
 import torch
 import base64
+import pickle
 import io
 from modules.safe import unsafe_torch_load
 
@@ -119,9 +120,15 @@ def to_base64_nparray(encoding: str) -> np.ndarray:
     """
     Convert a base64 image into the image type the extension uses
     """
+    try:
+        # Try to decode as a pickled 6-channel image
+        decoded = base64.b64decode(encoding)
+        image = pickle.loads(decoded)
+    except (pickle.UnpicklingError, TypeError, ValueError):
+        # If unpickling fails, try to decode as a 3-channel image
+        image = np.array(api.decode_base64_to_image(encoding)).astype('uint8')
 
-    return np.array(api.decode_base64_to_image(encoding)).astype("uint8")
-
+    return image
 
 def get_all_units_in_processing(
     p: processing.StableDiffusionProcessing,

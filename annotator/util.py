@@ -25,8 +25,6 @@ def HWC3(x):
     assert x.ndim == 3
     H, W, C = x.shape
     assert C == 1 or C == 3 or C == 4
-    if C == 3:
-        return x
     if C == 1:
         return np.concatenate([x, x, x], axis=2)
     if C == 4:
@@ -35,6 +33,7 @@ def HWC3(x):
         y = color * alpha + 255.0 * (1.0 - alpha)
         y = y.clip(0, 255).astype(np.uint8)
         return y
+    return x
 
 
 def make_noise_disk(H, W, C, F):
